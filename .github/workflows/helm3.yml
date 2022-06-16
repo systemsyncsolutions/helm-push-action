@@ -2,7 +2,10 @@ name: 'Helm3 pipeline'
 on:
   push:
     branches:
-      - helm3
+      - master
+  pull_request:
+    branches:
+      - master
 
 jobs:
 

@@ -1,5 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 set -e
+set -x
 
 if [ -z "$CHART_FOLDER" ]; then
   echo "CHART_FOLDER is not set. Quitting."
@@ -39,8 +41,12 @@ helm version -c
 
 helm inspect chart .
 
-helm package .
+if [[ $CHARTMUSEUM_REPO_NAME ]]; then
+  helm repo add ${CHARTMUSEUM_REPO_NAME} ${CHARTMUSEUM_URL} --username=${CHARTMUSEUM_USER} --password=${CHARTMUSEUM_PASSWORD}
+fi
 
 helm dependency update .
 
-helm push ${CHART_FOLDER}-* ${CHARTMUSEUM_URL} -u ${CHARTMUSEUM_USER} -p ${CHARTMUSEUM_PASSWORD} ${FORCE}
+helm package .
+
+helm cm-push ${CHART_FOLDER}-* ${CHARTMUSEUM_URL} -u ${CHARTMUSEUM_USER} -p ${CHARTMUSEUM_PASSWORD} ${FORCE}
